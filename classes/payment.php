@@ -15,6 +15,14 @@
  */
 namespace Payments;
 
+
+// Exception thrown when payment driver is missing.
+class PaymentGatewayNotFoundException extends \OutOfBoundsException {}
+
+// Exception thrown when payment driver is invalid.
+class PaymentGatewayInvalidException extends PaymentGatewayNotFoundException {}
+
+
 /**
  * Provides payment support for credit cards and other providers like PayPal.
  *
@@ -57,14 +65,14 @@ class Payment {
 
 		if(!isset($config['gateway']) or empty($config['gateway']))
 		{
-			throw new \Fuel_Exception('No payment gateway was specified, unable to instanciate driver.');
+			throw new PaymentGatewayNotFoundException('No payment gateway was specified, unable to instanciate driver.');
 		}
 
 		$driver = 'Payment_Driver_'.ucfirst($config['gateway']);
 
 		if(!class_exists($driver))
 		{
-			throw new \Fuel_Exception('An invalid gateway ['.$config['gateway'].'] was provided. This driver does not exist! ['.$driver.']');
+			throw new PaymentGatewayInvalidException('An invalid gateway ['.$config['gateway'].'] was provided. This driver does not exist! ['.$driver.']');
 		}
 
 		static::$instance = new $driver($config);
