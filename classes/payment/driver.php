@@ -157,9 +157,7 @@ abstract class Payment_Driver {
 	 *
 	 * @return   boolean
 	 */
-	public function process()
-	{
-	}
+	abstract public function process();
 }
 
 /* End of file driver.php */
