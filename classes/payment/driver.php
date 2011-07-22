@@ -25,150 +25,140 @@ namespace Payments;
  */
 abstract class Payment_Driver {
 
-	protected $fields = array(
-		'card_number' => 0,
-		'card_expires' => 'mm/yy',
-		'card_cvv' => 0,
-		'description' => '',
-		'amount' => 0,
-		'tax' => 0,
-		'shipping' => 0,
-		'name' => array(
-			'first' => '',
-			'last' => '',
-		),
-		'company' => '',
-		'address' => '',
-		'city' => '',
-		'state' => '',
-		'zip' => 0,
-		'ship_to' => array(
-			'name' => array(
-				'first' => '',
-				'last' => '',
-			),
-			'company' => '',
-			'address' => '',
-			'city' => '',
-			'state' => '',
-			'zip' => 0,
-		),
-		'email' => '',
-		'phone' => 0,
-		'fax' => 0,
-	);
-
 	/**
-	 * Which fields are required by this service provider?
+	 * Required driver fields to process a transaction
 	 *
-	 * @access protected
+	 * @var   array
 	 */
 	protected $required_fields = array();
 
 	/**
-	 * Error message storage.
+	 * Provided fields values during this execution
 	 *
-	 * @access protected
+	 * @var   array
+	 */
+	protected $fields = array();
+
+	/**
+	 * Runtime error cache
+	 *
+	 * @var   array
 	 */
 	protected $errors = array();
 
 	/**
-	 * Request body to be sent
+	 * Whether to run the payment as a test or live transaction
 	 *
-	 * @access protected
+	 * @var   boolean
 	 */
-	protected $_request = null;
-
+	protected $test_mode = true;
 
 	/**
-	 * Sets data within the driver to be sent to the service
-	 * provider in order to fulfill the payment request.
+	 * Response codes set from the gateway
 	 *
-	 * @param  array fields to be set
-	 * @return Payment_Driver
+	 * @var   array
 	 */
-	public function set_fields(array $fields)
+	protected $response;
+
+	/**
+	 * Whether a transaction has been completed
+	 *
+	 * @var   boolean
+	 */
+	protected $transaction = false;
+
+	/**
+	 * Set configuration options for utilization within the class
+	 *
+	 * @param   array     Configuration, normally passed from the Payments class
+	 */
+	public function __construct(array $config = array())
+	{
+		$this->test_mode   = $config['test_mode'];
+		$this->curl_config = $config['curl_config'];
+	}
+
+	/**
+	 * Sets the driver fields and marks required fields as true
+	 *
+	 * @param   array     array of key => value pairs to set
+	 * @return  object    \Payments\Payments_Driver
+	 */
+	public function set_fields(array $fields = array())
 	{
 		$this->fields = array_merge($fields, $this->fields);
-		
-		return $this;
-	}
 
-	/**
-	 * Send the request to the payment gateway. It will render
-	 * the request if one is not present.
-	 *
-	 * return boolean
-	 */
-	public function send()
-	{
-		if ( ! $this->_request)
+		// If a required key was provided, switch the boolean
+		foreach($fields as $key => $value)
 		{
-			$this->_build_request();
+			if(isset($key, $this->required_fields) and !empty($value))
+			{
+				$this->required_fields[$key] = true;
+			}
 		}
-		return $this->_send();
-	}
 
-	/**
-	 * The actual send logic
-	 */
-	protected abstract function _send();
-
-	/**
-	 * Build the request string to be sent to the payment gateway.
-	 *
-	 * @return Payment_Driver
-	 */
-	public function request()
-	{
-		$this->_request = $this->_build_request();
-		
 		return $this;
 	}
 
 	/**
-	 * The actual request logic.
-	 */
-	protected abstract function _build_request();
-
-	/**
-	 * Add an error to the errors array
+	 * Add an error to the errors cache
 	 *
-	 * @param  integer error code
-	 * @param  string  description of the error
-	 * @return Payment_Driver
+	 * @param   integer   Error code
+	 * @param   string    Error message
+	 * @return  object    \Payments\Payments_Driver
 	 */
-	public function set_error(integer $code, string $description)
+	public function set_error(integer $code, string $message)
 	{
-		$this->errors[$code] = $description;
-		
+		$this->errors[] = array(
+			'code'    => $code,
+			'message' => $message,
+		);
+
 		return $this;
 	}
 
 	/**
-	 * Check for an error by code and return its value if
-	 * it exists in the errors array.
+	 * Return the entire errors set
 	 *
-	 * @param integer     lookup code
-	 * @return array|null specific error or nothing
+	 * @return  array     Any errors that have occured
 	 */
-	public function error(integer $code)
+	public function get_errors()
 	{
-		if (array_key_exists($code, $this->errors))
+		return $this->errors;
+	}
+
+	/**
+	 * Get the last error that occured
+	 *
+	 * @return   array    The last error that occured
+	 */
+	public function get_last_error()
+	{
+		return end($this->errors);
+	}
+
+	/**
+	 * Retrieves the response array from a successful transaction
+	 *
+	 * @return   array|boolean
+	 */
+	public function get_response()
+	{
+		if($this->transaction !== false)
 		{
-			return $this->errors[$code];
+			return $this->response;
 		}
-		return null;
+
+		return false;
 	}
 
 	/**
-	 * Return the entire errors array
+	 * Run the transaction
 	 *
-	 * @return array all errors present
+	 * @return   boolean
 	 */
-	public function errors()
+	public function process()
 	{
-		return $this->errors();
 	}
 }
 

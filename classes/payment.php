@@ -25,95 +25,66 @@ namespace Payments;
  */
 class Payment {
 
-	protected static $_instance = null;
-
-	public static instance()
-	{
-		if (static::$_instance === null)
-		{
-			static::$_instance = static::factory();
-		}
-		return static::$_instance;
-	}
-
 	/**
-	 * Create a new instance of the payment driver.
+	 * Holds the active instance to the payment driver
 	 *
-	 * @param array configuration
+	 * @var     \Payments\Payment
 	 */
-	public static factory($config = array())
+	protected static $instance;
+
+	/**
+	 * Disable the ability to construct the object
+	 */
+	final private function __construct() {}
+
+	/**
+	 * Disable the ability to clone the object
+	 */
+	final private function __clone() {}
+
+	/**
+	 * Initializes a new payment instance.
+	 *
+	 * @param   array            ...
+	 * @return  object           Returns a new instance of the Payments driver
+	 * @throws  \Fuel_Exception  If an invalid or no gateway is provided, an exception is thrown.
+	 */
+	public static function factory(array $config = array())
 	{
-		$initconfig = Config::load('payments');
-		
-		if (is_array($initconfig) and is_array($config))
+		// TODO: Load the DRIVER configuration, not the global payments config. That's what we want to pass
+		// to the driver.
+		$config = array_merge($config, (array) \Config::load('payments', true));
+
+		if(!isset($config['gateway']) or empty($config['gateway']))
 		{
-			$config = array_merge($initconfig, $config);
+			throw new \Fuel_Exception('No payment gateway was specified, unable to instanciate driver.');
 		}
 
-		$gateway = ucfirst($config['gateway']);
-		$driver = 'Payment_Driver_' . $gateway;
-		
-		if ( ! class_exists($driver))
+		$driver = 'Payment_Driver_'.ucfirst($config['gateway']);
+
+		if(!class_exists($driver))
 		{
-			throw new \Fuel_Exception("Payment gateway $gateway is not valid.");
+			throw new \Fuel_Exception('An invalid gateway ['.$config['gateway'].'] was provided. This driver does not exist! ['.$driver.']');
 		}
-		
-		return new $class($config);
+
+		static::$instance = new $driver($config);
+
+		return static::$instance;
 	}
 
 	/**
-	 * Set fields needed for payment request
-	 * 
-	 * @param array fields to be added
-	 */
-	public static function set_fields(array $fields)
-	{
-		return static::instance()->set_fields($fields);
-	}
-
-	/**
-	 * Build the request to be sent.
-	 */
-	public static function request()
-	{
-		return static::instance()->request();
-	}
-
-	/**
-	 * Send the request to the payment gateway.
-	 */
-	public static function send()
-	{
-		return static::instance()->send();
-	}
-
-	/**
-	 * Set an error in the errors array
+	 * Returns the active Payments driver instance or creates a new one if none exists
 	 *
-	 * @param integer error code
-	 * @param string  description of error
+	 * @return  object           Returns an instance of a Payments driver
 	 */
-	public static function set_error(integer $code, string $description)
+	public static function instance(array $config = array())
 	{
-		return static::instance()->set_error($code, $description);
-	}
+		if(static::$instance === null)
+		{
+			static::factory($config);
+		}
 
-	/**
-	 * Get an error by its code.
-	 *
-	 * @param integer code requested
-	 */
-	public static function error(integer $code)
-	{
-		return static::instance()->error($code);
-	}
-
-	/**
-	 * Return all errors in an array.
-	 */
-	public static function errors()
-	{
-		return static::instance()->errors();
+		return static::$instance;
 	}
 }
 
