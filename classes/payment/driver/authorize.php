@@ -20,6 +20,7 @@ namespace Payments;
  *
  * @package    Payments
  * @author     Chase "Syntaqx" Hutchins
+ * @author     Frank Bardon Jr. <frank@nerdsrescue.me>
  * @version    1.0
  */
 class Payment_Driver_Authorize extends Payment_Driver {
@@ -113,7 +114,7 @@ class Payment_Driver_Authorize extends Payment_Driver {
 				}
 			}
 
-			throw new \Fuel_Exception('Missing required fields: '.implode(', ', $fields));
+			throw new PaymentGatewayException('Missing required fields: '.implode(', ', $fields));
 		}
 
 		$fields = '';
@@ -136,7 +137,7 @@ class Payment_Driver_Authorize extends Payment_Driver {
 		
 		if(!$response)
 		{
-			throw new \Fuel_Exception('Connection error into payments gateway..');
+			throw new PaymentGatewayException('Connection error into payments gateway..');
 		}
 
 		// This could probably be done better, but it's taken right from the
@@ -154,7 +155,7 @@ class Payment_Driver_Authorize extends Payment_Driver {
 
 				if($response_code == '')
 				{
-					throw new \Fuel_Exception('payment.gateway_connection_error');
+					throw new PaymentGatewayException('payment.gateway_connection_error');
 				}
 
 				switch($i)

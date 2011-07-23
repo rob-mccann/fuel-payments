@@ -16,14 +16,11 @@
 namespace Payments;
 
 
-// Exception thrown when payment driver is missing.
-class PaymentGatewayNotFoundException extends \OutOfBoundsException {}
+// Exception thrown when payment gateway is unreachable.
+class PaymentGatewayException extends \OutOfBoundsException {}
 
 // Exception thrown when payment driver is invalid.
-class PaymentGatewayInvalidException extends PaymentGatewayNotFoundException {}
-
-// Exception thrown when payment gateway is unreachable.
-class PaymentGatewayUnreachable extends \PaymentGatewayNotFoundException {}
+class PaymentGatewayInvalidException extends PaymentGatewayException {}
 
 
 /**
@@ -68,7 +65,7 @@ class Payment {
 
 		if(!isset($config['gateway']) or empty($config['gateway']))
 		{
-			throw new PaymentGatewayNotFoundException('No payment gateway was specified, unable to instanciate driver.');
+			throw new PaymentGatewayInvalidException('No payment gateway was specified, unable to instantiate driver.');
 		}
 
 		$driver = 'Payment_Driver_'.ucfirst($config['gateway']);
