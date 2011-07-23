@@ -64,7 +64,7 @@ class Payment {
 	{
 		// TODO: Load the DRIVER configuration, not the global payments config. That's what we want to pass
 		// to the driver.
-		$config = array_merge($config, (array) \Config::load('payments', true));
+		$config = \Arr::merge($config, (array) \Config::load('payments', true));
 
 		if(!isset($config['gateway']) or empty($config['gateway']))
 		{
