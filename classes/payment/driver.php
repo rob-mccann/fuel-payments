@@ -86,7 +86,7 @@ abstract class Payment_Driver {
 	 */
 	public function set_fields(array $fields = array())
 	{
-		$this->fields = array_merge($fields, $this->fields);
+		$this->fields = \Arr::merge($fields, $this->fields);
 
 		// If a required key was provided, switch the boolean
 		foreach($fields as $key => $value)
