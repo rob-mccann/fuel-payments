@@ -22,6 +22,9 @@ class PaymentGatewayNotFoundException extends \OutOfBoundsException {}
 // Exception thrown when payment driver is invalid.
 class PaymentGatewayInvalidException extends PaymentGatewayNotFoundException {}
 
+// Exception thrown when payment gateway is unreachable.
+class PaymentGatewayUnreachable extends \PaymentGatewayNotFoundException {}
+
 
 /**
  * Provides payment support for credit cards and other providers like PayPal.
