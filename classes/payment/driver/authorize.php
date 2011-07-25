@@ -69,8 +69,8 @@ class Payment_Driver_Authorize extends Payment_Driver {
 	public function __construct(array $config = array())
 	{
 		$this->set_fields(array(
-			'login'    => $config['auth_net_login_id'],
-			'tran_key' => $config['auth_net_tran_key'],
+			'login'    => $config['authorize']['auth_net_login_id'],
+			'tran_key' => $config['authorize']['auth_net_tran_key'],
 		));
 
 		parent::__construct($config);
@@ -101,7 +101,7 @@ class Payment_Driver_Authorize extends Payment_Driver {
 	 */
 	public function process()
 	{
-		// Validate private fields have been set
+		// Validate required fields have been set
 		if(in_array(false, $this->required_fields))
 		{
 			$fields = array();
@@ -114,7 +114,7 @@ class Payment_Driver_Authorize extends Payment_Driver {
 				}
 			}
 
-			throw new PaymentGatewayException('Missing required fields: '.implode(', ', $fields));
+			throw new \Fuel_Exception(\Lang::line('payments.required', array('fields' => implode(', ', $fields))));
 		}
 
 		$fields = '';

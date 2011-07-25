@@ -15,14 +15,6 @@
  */
 namespace Payments;
 
-
-// Exception thrown when payment gateway is unreachable.
-class PaymentGatewayException extends \OutOfBoundsException {}
-
-// Exception thrown when payment driver is invalid.
-class PaymentGatewayInvalidException extends PaymentGatewayException {}
-
-
 /**
  * Provides payment support for credit cards and other providers like PayPal.
  *
@@ -59,6 +51,9 @@ class Payment {
 	 */
 	public static function factory(array $config = array())
 	{
+		// Load the language files
+		\Lang::load('payments', true);
+
 		// TODO: Load the DRIVER configuration, not the global payments config. That's what we want to pass
 		// to the driver.
 		$config = \Arr::merge($config, (array) \Config::load('payments', true));

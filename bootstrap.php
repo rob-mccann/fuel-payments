@@ -27,10 +27,6 @@ Autoloader::add_classes(array(
 	'Payments\\Payment_Driver_Trident'          => __DIR__.'/classes/payment/driver/trident.php',
 	'Payments\\Payment_Driver_Trustcommerce'    => __DIR__.'/classes/payment/driver/trustcommerce.php',
 	'Payments\\Payment_Driver_Yourpay'          => __DIR__.'/classes/payment/driver/yourpay.php',
-
-	// Exceptions
-	'Payments\\PaymentGatewayNotFoundException' => __DIR__.'/classes/payment.php',
-	'Payments\\PaymentGatewayInvalidException'  => __DIR__.'/classes/payment.php',
 ));
 
 /* End of file bootstrap.php */

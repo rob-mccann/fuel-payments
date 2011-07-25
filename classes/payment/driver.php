@@ -75,7 +75,15 @@ abstract class Payment_Driver {
 	public function __construct(array $config = array())
 	{
 		$this->test_mode   = $config['test_mode'];
-		$this->curl_config = $config['curl_config'];
+
+		// Only set default curl configs if they weren't set by the driver
+		foreach($config['curl_config'] as $key => $value)
+		{
+			if(!isset($this->curl_config[$key]))
+			{
+				$this->curl_config[$key] = $value;
+			}
+		}
 	}
 
 	/**
@@ -86,14 +94,21 @@ abstract class Payment_Driver {
 	 */
 	public function set_fields(array $fields = array())
 	{
-		$this->fields = \Arr::merge($fields, $this->fields);
+		$this->fields = \Arr::merge($this->fields, $fields);
 
 		// If a required key was provided, switch the boolean
 		foreach($fields as $key => $value)
 		{
-			if(isset($key, $this->required_fields) and !empty($value))
+			if(isset($key, $this->required_fields))
 			{
-				$this->required_fields[$key] = true;
+				if(!empty($value))
+				{
+					$this->required_fields[$key] = true;
+				}
+				else
+				{
+					$this->required_fields[$key] = false;
+				}
 			}
 		}
 
@@ -107,7 +122,7 @@ abstract class Payment_Driver {
 	 * @param   string    Error message
 	 * @return  object    \Payments\Payments_Driver
 	 */
-	public function set_error(integer $code, string $message)
+	public function set_error($code, $message)
 	{
 		$this->errors[] = array(
 			'code'    => $code,
