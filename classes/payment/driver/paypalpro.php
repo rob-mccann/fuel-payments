@@ -136,6 +136,7 @@ class Payment_Driver_Paypalpro extends Payment_Driver {
 		$this->set_fields(array(
 			'VERSION'      => $config['paypalpro']['VERSION'],
 			'CURRENCYCODE' => $config['paypalpro']['CURRENCYCODE'],
+			'IPADDRESS'    => $_SERVER['REMOTE_ADDR'], // It might be worth removing this, but it's nice to have as a default
 		));
 	}
 
