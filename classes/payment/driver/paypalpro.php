@@ -204,23 +204,20 @@ class Payment_Driver_Paypalpro extends Payment_Driver {
 
 		$this->transaction = strtolower($this->response['ACK']) != 'failure';
 
-		if(!$this->transaction)
+		$iterator = 0;
+
+		while($iterator !== false)
 		{
-			$iterator = 0;
-
-			while($iterator !== false)
+			if(isset($this->response['L_ERRORCODE'.$iterator]))
 			{
-				if(isset($this->response['L_ERRORCODE'.$iterator]))
-				{
-					$this->set_error($this->response['L_ERRORCODE'.$iterator], $this->response['L_LONGMESSAGE'.$iterator]);
-					unset($this->response['L_ERRORCODE'.$iterator], $this->response['L_SHORTMESSAGE'.$iterator],$this->response['L_LONGMESSAGE'.$iterator],$this->response['L_SEVERITYCODE'.$iterator]);
+				$this->set_error($this->response['L_ERRORCODE'.$iterator], $this->response['L_LONGMESSAGE'.$iterator]);
+				unset($this->response['L_ERRORCODE'.$iterator], $this->response['L_SHORTMESSAGE'.$iterator],$this->response['L_LONGMESSAGE'.$iterator],$this->response['L_SEVERITYCODE'.$iterator]);
 
-					++$iterator;
-				}
-				else
-				{
-					$iterator = false;
-				}
+				++$iterator;
+			}
+			else
+			{
+				$iterator = false;
 			}
 		}
 
