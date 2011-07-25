@@ -204,7 +204,10 @@ class Payment_Driver_Paypalpro extends Payment_Driver {
 
 		parse_str(urldecode($response), $response_array);
 
-		if(strtolower($response_array['ACK']) == 'failure')
+		$this->transaction = strtolower($response_array['ACK']) != 'failure';
+		$this->response    = $response_array();
+
+		if(!$this->transaction)
 		{
 			$this->set_error($response_array['L_ERRORCODE0'], $response_array['L_LONGMESSAGE0']);
 			return false;
