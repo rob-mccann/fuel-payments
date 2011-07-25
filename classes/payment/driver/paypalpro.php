@@ -207,10 +207,9 @@ class Payment_Driver_Paypalpro extends Payment_Driver {
 		if(!$this->transaction)
 		{
 			$this->set_error($response_array['L_ERRORCODE0'], $response_array['L_LONGMESSAGE0']);
-			return false;
 		}
 
-		return true;
+		return $this->transaction;
 	}
 }
 
