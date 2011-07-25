@@ -159,12 +159,7 @@ abstract class Payment_Driver {
 	 */
 	public function get_response()
 	{
-		if($this->transaction !== false)
-		{
-			return $this->response;
-		}
-
-		return false;
+		return $this->response;
 	}
 
 	/**
