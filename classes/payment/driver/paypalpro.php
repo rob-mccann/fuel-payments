@@ -200,12 +200,9 @@ class Payment_Driver_Paypalpro extends Payment_Driver {
 			throw new \Fuel_Exception(\Lang::line('payments.gateway_connection_error'));
 		}
 
-		$response_array = array();
-
-		parse_str(urldecode($response), $response_array);
+		parse_str(urldecode($response), $this->response);
 
 		$this->transaction = strtolower($response_array['ACK']) != 'failure';
-		$this->response    = $response_array();
 
 		if(!$this->transaction)
 		{
