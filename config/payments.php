@@ -67,6 +67,26 @@ return array(
 		),
 	),
 
+	/**
+	 * Google Checkout Options
+	 *
+	 * @var    array
+	 */
+	'paypalpro'     => array(
+		// Authorization credentials
+		'MERCHANT_ID'         => '',
+		'ENDPOINT'            => 'https://sandbox.google.com/checkout/api/checkout/v2/merchantCheckout/Merchant/',
+
+		// Test mode
+		'SANDBOX_ENDPOINT'    => 'https://checkout.google.com/api/checkout/v2/merchantCheckout/Merchant/',
+
+		// CURL Configurations
+		'curl_config'       => array(
+			CURLOPT_SSL_VERIFYHOST => false,
+			CURLOPT_VERBOSE        => true,
+			CURLOPT_POST           => true,
+		),
+	),
 );
 
 /* End of file payments.php */
